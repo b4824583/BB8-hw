@@ -24,12 +24,17 @@
 			var camera, scene, renderer;
 			var mesh;
 			var meshHead;
+			var day=new Date();
+			var second=day.getSeconds();
+			var gravity = 2.0; // 向上為正//改了他的正負數
+			var jumpVelocity=gravity*15;
+			var WhetherJump=false;
 
-			var gravity = -9.8; // 向上為正
+
 			var velocity = 0;
 			var heading = 0;
 			var lastTime;
-			// var speed=0.05;
+
 			var forwardX=0;
 			var forwardZ=1;
 			var meshAngle=Math.PI/2;
@@ -133,7 +138,7 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 10, 5000 );
 				camera.position.y = 500;
 				camera.position.z = 400;
-				// camera.position.x =400;
+				// camera.position.x =900;
 				cameraZ=camera.position.z;
 				cameraX=camera.position.x; 
 				scene = new THREE.Scene();
@@ -218,8 +223,6 @@
 							velocity += params.addSpeed;
 							params.Velocity = velocity;
 
-				// 			alert(camera.position.x);
-				// alert(camera.position.y);
 
 							break;
 					  case 's': case 'S':
@@ -233,24 +236,23 @@
 							meshAngle+=(rot_speed*rotateAngle);
 							forwardX=Math.cos(meshAngle);
 							forwardZ=Math.sin(meshAngle);
-
+							heading=(meshAngle-Math.PI/2)%Math.PI;
 							break;
-			          case 'd': case 'D':
+		              case 'd': case 'D':
 							rot_speed=params.rotSpeed;							
 							mesh.rotateOnWorldAxis(new THREE.Vector3(0,1,0),rot_speed*rotateAngle*-1);
 
 							meshAngle-=(rot_speed*rotateAngle);
 							forwardX=Math.cos(meshAngle);
 							forwardZ=Math.sin(meshAngle);
-
+							heading=(meshAngle-Math.PI/2)%Math.PI;
 							break;
-						case "z":
-							camera.position.x=500;
-							camera.position.z=500;
-						break;	
-						case "x":
-							camera.position.x-=1;
-							camera.position.z-=1;
+						case " ":
+								// second=day.getSeconds();
+								// jumpVelocity
+								// mesh.position.y+=150;
+								// meshHead.position.y+=150;
+								WhetherJump=true;
 						break;
 			        }
 			    };
@@ -282,10 +284,31 @@
 					camera.position.x=cameraX+mesh.position.x;
 				}
 
+				if(WhetherJump==true)
+				{
+					if(jumpVelocity<gravity*-15)
+					{
+						jumpVelocity=gravity*15;
+						WhetherJump=false;
+					}
+					else
+					{
+						mesh.position.y+=jumpVelocity;
+						meshHead.position.y+=jumpVelocity;
+						jumpVelocity-=gravity;
+					}
+
+
+					console.log(mesh.position.y);
+
+
+
+				}
+
 
 				params.Velocity = velocity;
 				params.Heading = heading;
-				// params.rotSpeed=rot_speed;
+
 
 				renderer.render( scene, camera );
 				// have the mouse update the view
