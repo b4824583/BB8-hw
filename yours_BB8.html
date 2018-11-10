@@ -26,8 +26,8 @@
 			var meshHead;
 			var day=new Date();
 			var second=day.getSeconds();
-			var gravity = 2.0; // 向上為正//改了他的正負數
-			var jumpVelocity=gravity*15;
+			var gravity = 9.8; // 向上為正//改了他的正負數
+			var jumpVelocity=gravity*5;
 			var WhetherJump=false;
 
 
@@ -270,9 +270,10 @@
 				// Rotate the wheel
 				var deltaTime = Date.now() - lastTime;
 				lastTime = Date.now();
+
 				mesh.rotateOnAxis ( new THREE.Vector3( 0, 0, -1 ), velocity/1000);
 				Forward();
-
+				// console.log(deltaTime);
 				//or rotateOnWorldAxis?? check the document :)
 				
 				// Move the body & head
@@ -282,24 +283,35 @@
 					// camera.position.z=camera.position.z-mesh.position.z;
 					camera.position.z=cameraZ+mesh.position.z;
 					camera.position.x=cameraX+mesh.position.x;
+					camera.lookAt(meshHead.position);
 				}
-
+				
 				if(WhetherJump==true)
 				{
-					if(jumpVelocity<gravity*-15)
+					if(jumpVelocity<gravity*-5)
 					{
-						jumpVelocity=gravity*15;
+						jumpVelocity=gravity*5;
 						WhetherJump=false;
+						console.log("jumpclosed");
 					}
 					else
 					{
-						mesh.position.y+=jumpVelocity;
-						meshHead.position.y+=jumpVelocity;
-						jumpVelocity-=gravity;
+						// mesh.position.y+=jumpVelocity;
+						// meshHead.position.y+=jumpVelocity;
+						// jumpVelocity-=gravity;
+						jumpVelocity -= 10*gravity*deltaTime/1000.0;
+						mesh.position.y += 10*jumpVelocity*deltaTime/1000.0;
+						meshHead.position.y+=10*jumpVelocity*deltaTime/1000.0;
+						if(mesh.position.y < 50.01){
+							meshHead.position.y = 100.01;
+							mesh.position.y = 50.01;
+							velocityH = 0;
+						}
+						console.log(deltaTime);
 					}
 
 
-					console.log(mesh.position.y);
+					// console.log(mesh.position.y);
 
 
 
@@ -313,7 +325,7 @@
 				renderer.render( scene, camera );
 				// have the mouse update the view
 				//這行到底是幹嘛的，真心不懂。，把他註解掉之後，camera就能正常運作。詭異
-//				controls.update();
+				controls.update();
 				TWEEN.update();
 			}
 		</script>
